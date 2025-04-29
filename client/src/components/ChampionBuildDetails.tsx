@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RunesDisplay from "./RunesDisplay";
 import { getChampionRunes } from '@/data/runes';
+import { Champion } from '@shared/schema';
 import { 
   Loader2
 } from 'lucide-react';
@@ -12,6 +13,21 @@ interface ChampionBuildDetailsProps {
   lane: string;
 }
 
+interface BuildItem {
+  id: number;
+  name: string;
+  imagePath: string;
+  description: string;
+}
+
+interface ChampionBuild {
+  championId: string;
+  lane: string;
+  startingItems: BuildItem[];
+  coreItems: BuildItem[];
+  situationalItems: BuildItem[];
+}
+
 export default function ChampionBuildDetails({ 
   championId, 
   lane 
@@ -19,13 +35,13 @@ export default function ChampionBuildDetails({
   const [activeTab, setActiveTab] = useState("items");
   
   // Fetch champion details to get name
-  const { data: champion, isLoading: isLoadingChampion } = useQuery({
+  const { data: champion, isLoading: isLoadingChampion } = useQuery<Champion>({
     queryKey: [`/api/champions/${championId}`],
     enabled: !!championId
   });
   
   // Fetch build details
-  const { data: buildData, isLoading: isLoadingBuild } = useQuery({
+  const { data: buildData, isLoading: isLoadingBuild } = useQuery<ChampionBuild>({
     queryKey: [`/api/builds/${championId}`, lane],
     enabled: !!championId && !!lane
   });
@@ -77,7 +93,7 @@ export default function ChampionBuildDetails({
                   <div className="mb-6">
                     <h4 className="text-lol-gold mb-3 border-b border-lol-gold-dark pb-2">Starting Items</h4>
                     <div className="flex items-center">
-                      {buildData.startingItems.map((item: any) => (
+                      {buildData.startingItems.map((item: BuildItem) => (
                         <div key={item.id} className="item-icon mr-2 relative group">
                           <img
                             src={item.imagePath}
@@ -97,7 +113,7 @@ export default function ChampionBuildDetails({
                   <div className="mb-6">
                     <h4 className="text-lol-gold mb-3 border-b border-lol-gold-dark pb-2">Core Items</h4>
                     <div className="flex flex-wrap">
-                      {buildData.coreItems.map((item: any) => (
+                      {buildData.coreItems.map((item: BuildItem) => (
                         <div key={item.id} className="item-icon mr-2 mb-2 relative group">
                           <img
                             src={item.imagePath}
@@ -117,7 +133,7 @@ export default function ChampionBuildDetails({
                   <div>
                     <h4 className="text-lol-gold mb-3 border-b border-lol-gold-dark pb-2">Situational Items</h4>
                     <div className="flex flex-wrap">
-                      {buildData.situationalItems.map((item: any) => (
+                      {buildData.situationalItems.map((item: BuildItem) => (
                         <div key={item.id} className="item-icon mr-2 mb-2 relative group">
                           <img
                             src={item.imagePath}

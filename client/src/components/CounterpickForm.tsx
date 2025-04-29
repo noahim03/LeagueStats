@@ -182,7 +182,7 @@ export default function CounterpickForm({
                   <FormLabel className="font-medium">Your Champion (Optional)</FormLabel>
                   <FormControl>
                     <SearchableChampionSelect 
-                      value={field.value}
+                      value={field.value || "none"}
                       onChange={field.onChange}
                       placeholder="Search for your champion..."
                       isOptional={true}
