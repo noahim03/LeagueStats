@@ -78,18 +78,18 @@ export default function CounterpickForm({
       lane: selectedLane || "mid",
       yourChampion: selectedYourChampion || ""
     });
-  }, [selectedEnemyChampion, selectedLane, selectedYourChampion]);
+  }, [selectedEnemyChampion, selectedLane, selectedYourChampion, form]);
   
   // Fetch enemy champion details when selected
   useEffect(() => {
     const enemyChampionId = form.watch("enemyChampion");
     if (enemyChampionId && champions) {
-      const champion = champions.find((c: any) => c.id === enemyChampionId);
-      setEnemyChampionDetails(champion);
+      const champion = champions.find(c => c.id === enemyChampionId);
+      setEnemyChampionDetails(champion || null);
     } else {
       setEnemyChampionDetails(null);
     }
-  }, [form.watch("enemyChampion"), champions]);
+  }, [form.watch("enemyChampion"), champions, form]);
   
   // Handle form submission
   const handleSubmit = (values: FormValues) => {
@@ -137,7 +137,7 @@ export default function CounterpickForm({
                       {isLoadingChampions ? (
                         <SelectItem value="loading" disabled>Loading champions...</SelectItem>
                       ) : champions && champions.length > 0 ? (
-                        champions.map((champion: any) => (
+                        champions.map((champion) => (
                           <SelectItem key={champion.id} value={champion.id}>
                             {champion.name}
                           </SelectItem>
@@ -211,7 +211,7 @@ export default function CounterpickForm({
                       {isLoadingChampions ? (
                         <SelectItem value="loading" disabled>Loading champions...</SelectItem>
                       ) : champions && champions.length > 0 ? (
-                        champions.map((champion: any) => (
+                        champions.map((champion) => (
                           <SelectItem key={champion.id} value={champion.id}>
                             {champion.name}
                           </SelectItem>
