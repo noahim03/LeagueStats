@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import EnemyChampionPreview from "./EnemyChampionPreview";
+import SearchableChampionSelect from "./SearchableChampionSelect";
 import { Champion } from "@shared/schema";
 import { 
   Crown, 
@@ -123,30 +124,13 @@ export default function CounterpickForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-medium">Enemy Champion</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    defaultValue={field.value}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full p-3 rounded bg-lol-blue border border-lol-gold-dark text-lol-gray-light focus:ring-lol-gold">
-                        <SelectValue placeholder="Select a champion" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-lol-blue-dark border-lol-gold-dark">
-                      {isLoadingChampions ? (
-                        <SelectItem value="loading" disabled>Loading champions...</SelectItem>
-                      ) : champions && champions.length > 0 ? (
-                        champions.map((champion) => (
-                          <SelectItem key={champion.id} value={champion.id}>
-                            {champion.name}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="no-data" disabled>No champions available</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <SearchableChampionSelect 
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Search for enemy champion..."
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -196,31 +180,14 @@ export default function CounterpickForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-medium">Your Champion (Optional)</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    defaultValue={field.value}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full p-3 rounded bg-lol-blue border border-lol-gold-dark text-lol-gray-light focus:ring-lol-gold">
-                        <SelectValue placeholder="Select a champion" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-lol-blue-dark border-lol-gold-dark">
-                      <SelectItem value="none">None</SelectItem>
-                      {isLoadingChampions ? (
-                        <SelectItem value="loading" disabled>Loading champions...</SelectItem>
-                      ) : champions && champions.length > 0 ? (
-                        champions.map((champion) => (
-                          <SelectItem key={champion.id} value={champion.id}>
-                            {champion.name}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="no-data" disabled>No champions available</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <SearchableChampionSelect 
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Search for your champion..."
+                      isOptional={true}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

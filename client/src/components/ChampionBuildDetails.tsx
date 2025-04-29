@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import RunesDisplay from "./RunesDisplay";
+import { getChampionRunes } from '@/data/runes';
 import { 
   Loader2
 } from 'lucide-react';
@@ -137,9 +139,13 @@ export default function ChampionBuildDetails({
             </TabsContent>
             
             <TabsContent value="runes">
-              <div className="flex justify-center items-center py-8">
-                <p className="text-lol-gray">Rune data will be available in a future update.</p>
-              </div>
+              {championId && lane ? (
+                <RunesDisplay runeSets={getChampionRunes(championId, lane) || []} />
+              ) : (
+                <div className="text-center text-lol-gray py-4">
+                  <p>No rune data available for this champion and lane.</p>
+                </div>
+              )}
             </TabsContent>
             
             <TabsContent value="summoners">
