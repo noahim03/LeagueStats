@@ -94,6 +94,7 @@ export default function CounterpickForm({
   
   // Handle form submission
   const handleSubmit = (values: FormValues) => {
+    console.log("Submitting form with values:", values); // Debug log
     onSubmit(
       values.enemyChampion, 
       values.lane, 
@@ -127,7 +128,10 @@ export default function CounterpickForm({
                   <FormControl>
                     <SearchableChampionSelect 
                       value={field.value}
-                      onChange={field.onChange}
+                      onChange={(value) => {
+                        console.log("Selected champion:", value); // Debug log
+                        field.onChange(value);
+                      }}
                       placeholder="Search for enemy champion..."
                     />
                   </FormControl>
@@ -155,11 +159,11 @@ export default function CounterpickForm({
                           <RadioGroupItem 
                             id={lane.id} 
                             value={lane.id} 
-                            className="sr-only peer"
+                            className="peer"
                           />
                           <label 
                             htmlFor={lane.id}
-                            className="flex flex-col items-center justify-center p-2 cursor-pointer border border-lol-gold-dark rounded bg-lol-blue hover:bg-lol-blue-light peer-checked:border-lol-gold peer-checked:bg-lol-blue-light"
+                            className="flex flex-col items-center justify-center p-2 cursor-pointer border border-lol-gold-dark rounded bg-lol-blue hover:bg-lol-blue-light peer-checked:bg-gray-700 peer-checked:border-lol-gold"
                           >
                             <lane.icon className="mb-1 text-lol-gold h-5 w-5" />
                             <span className="text-xs">{lane.name}</span>
@@ -196,7 +200,7 @@ export default function CounterpickForm({
             {/* Submit Button */}
             <Button 
               type="submit" 
-              className="w-full bg-lol-gold-dark hover:bg-lol-gold text-lol-gray-light transition-colors duration-200"
+              className="w-full bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 transition-colors duration-200"
             >
               <Search className="mr-2 h-4 w-4" />
               Find Counters

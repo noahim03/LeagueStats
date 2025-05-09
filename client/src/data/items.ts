@@ -40,7 +40,7 @@ export async function getItems() {
 
 export async function getItemById(id: number) {
   const items = await getItems();
-  return items.find(item => item.id === id);
+  return items.find((item: any) => item.id === id);
 }
 
 // Mock item data for fallback

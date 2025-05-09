@@ -1,5 +1,5 @@
 import { apiRequest } from "@/lib/queryClient";
-
+import { Champion } from "@shared/data/champions";
 // Champions cache
 let championsCache: any[] | null = null;
 
@@ -40,7 +40,7 @@ export async function getChampions() {
 
 export async function getChampionById(id: string) {
   const champions = await getChampions();
-  return champions.find(champion => champion.id === id);
+  return champions.find((champion: Champion) => champion.id === id);
 }
 
 // Mock champion data for fallback

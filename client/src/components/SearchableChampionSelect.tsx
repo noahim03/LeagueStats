@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Champion } from "@shared/schema";
+import { useState } from "react";
+import { Champion, champions } from "@shared/data/champions";
 import {
   Command,
   CommandEmpty,
@@ -35,13 +34,8 @@ export default function SearchableChampionSelect({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch champions data
-  const { data: champions, isLoading } = useQuery<Champion[]>({
-    queryKey: ['/api/champions'],
-  });
-
   // Filter champions based on search query
-  const filteredChampions = champions?.filter(champion => 
+  const filteredChampions = champions.filter(champion => 
     champion.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -54,7 +48,7 @@ export default function SearchableChampionSelect({
           aria-expanded={open}
           className={cn("w-full justify-between bg-lol-blue border border-lol-gold-dark text-lol-gray-light", className)}
         >
-          {value && champions ? (
+          {value ? (
             champions.find(champion => champion.id === value)?.name || placeholder
           ) : (
             placeholder
@@ -62,17 +56,23 @@ export default function SearchableChampionSelect({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 bg-lol-blue-dark border-lol-gold-dark">
-        <Command className="bg-transparent">
-          <CommandInput 
-            placeholder="Search champion..." 
-            onValueChange={setSearchQuery}
-            className="text-lol-gray-light"
-          />
-          <CommandEmpty className="py-6 text-center text-lol-gray">
+      <PopoverContent className="w-full p-0 bg-gray-800 border-lol-gold-dark">
+        <Command className="bg-gray-800">
+          <div className="relative">
+            <div className="absolute left-0 right-0 bottom-0 h-[1px] bg-white">
+              <div className="absolute left-0 w-2 h-2 bg-gray-800 rounded-full -translate-y-1/2"></div>
+              <div className="absolute right-0 w-2 h-2 bg-gray-800 rounded-full -translate-y-1/2"></div>
+            </div>
+            <CommandInput 
+              placeholder="Search champion..." 
+              onValueChange={setSearchQuery}
+              className="text-gray-200 bg-gray-800 border-0"
+            />
+          </div>
+          <CommandEmpty className="py-6 text-center text-gray-400 bg-gray-800">
             No champion found.
           </CommandEmpty>
-          <CommandGroup className="max-h-60 overflow-y-auto">
+          <CommandGroup className="max-h-60 overflow-y-auto bg-gray-800">
             {isOptional && (
               <CommandItem
                 value="none"
@@ -80,7 +80,7 @@ export default function SearchableChampionSelect({
                   onChange("none");
                   setOpen(false);
                 }}
-                className="flex items-center gap-2 hover:bg-lol-blue focus:bg-lol-blue-light text-lol-gray-light"
+                className="flex items-center gap-2 hover:bg-gray-700 focus:bg-gray-700 text-gray-200 bg-gray-800"
               >
                 <Check
                   className={cn(
@@ -91,43 +91,29 @@ export default function SearchableChampionSelect({
                 None
               </CommandItem>
             )}
-            {isLoading ? (
-              <CommandItem disabled className="text-lol-gray py-2">
-                Loading champions...
-              </CommandItem>
-            ) : (
-              filteredChampions?.map((champion) => (
-                <CommandItem
-                  key={champion.id}
-                  value={champion.id}
-                  onSelect={() => {
-                    onChange(champion.id);
-                    setOpen(false);
-                  }}
-                  className="flex items-center gap-2 hover:bg-lol-blue focus:bg-lol-blue-light text-lol-gray-light"
-                >
-                  <div className="flex items-center gap-2 w-full">
-                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                      <img 
-                        src={champion.imagePath} 
-                        alt={champion.name} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{champion.name}</p>
-                      <p className="text-xs text-lol-gray">{champion.roles.join(', ')}</p>
-                    </div>
-                    <Check
-                      className={cn(
-                        "ml-auto h-4 w-4",
-                        value === champion.id ? "opacity-100 text-lol-gold" : "opacity-0"
-                      )}
-                    />
+            {filteredChampions.map((champion) => (
+              <CommandItem
+                key={champion.id}
+                value={champion.id}
+                onSelect={() => {
+                  onChange(champion.id);
+                  setOpen(false);
+                }}
+                className="flex items-center gap-2 hover:bg-gray-700 focus:bg-gray-700 text-gray-200 bg-gray-800"
+              >
+                <div className="flex items-center gap-2 w-full">
+                  <div>
+                    <p className="text-sm font-medium">{champion.name}</p>
                   </div>
-                </CommandItem>
-              ))
-            )}
+                  <Check
+                    className={cn(
+                      "ml-auto h-4 w-4",
+                      value === champion.id ? "opacity-100 text-lol-gold" : "opacity-0"
+                    )}
+                  />
+                </div>
+              </CommandItem>
+            ))}
           </CommandGroup>
         </Command>
       </PopoverContent>
