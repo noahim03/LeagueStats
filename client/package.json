@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "dev": "concurrently \"NODE_ENV=development tsx server/index.ts\" \"VITE_SUPABASE_URL=$VITE_SUPABASE_URL VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY vite\"",
+    "build": "vite build",
+    "preview": "vite preview"
+  }
+}
