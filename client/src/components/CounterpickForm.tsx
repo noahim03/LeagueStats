@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,9 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import EnemyChampionPreview from "./EnemyChampionPreview";
 import SearchableChampionSelect from "./SearchableChampionSelect";
-import { Champion } from "@shared/schema";
 import { 
   Crown, 
   TreePine, 
@@ -35,70 +32,44 @@ import {
 // Form schema
 const formSchema = z.object({
   enemyChampion: z.string().min(1, "Enemy champion is required"),
-  lane: z.string().min(1, "Lane is required"),
-  yourChampion: z.string().optional()
+  lane: z.string().min(1, "Lane is required")
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 interface CounterpickFormProps {
-  onSubmit: (enemyChampionId: string, lane: string, yourChampionId: string | null) => void;
+  onSubmit: (enemyChampionId: string, lane: string) => void;
   selectedEnemyChampion: string | null;
   selectedLane: string;
-  selectedYourChampion: string | null;
 }
 
 export default function CounterpickForm({ 
   onSubmit, 
   selectedEnemyChampion,
-  selectedLane,
-  selectedYourChampion
+  selectedLane
 }: CounterpickFormProps) {
-  // Fetch champions data
-  const { data: champions, isLoading: isLoadingChampions } = useQuery<Champion[]>({
-    queryKey: ['/api/champions'],
-  });
-  
   // Set up form with default values
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       enemyChampion: selectedEnemyChampion || "",
-      lane: selectedLane || "mid",
-      yourChampion: selectedYourChampion || ""
+      lane: selectedLane || "mid"
     }
   });
-  
-  // Selected enemy champion details
-  const [enemyChampionDetails, setEnemyChampionDetails] = useState<Champion | null>(null);
   
   // Update form values when props change
   useEffect(() => {
     form.reset({
       enemyChampion: selectedEnemyChampion || "",
-      lane: selectedLane || "mid",
-      yourChampion: selectedYourChampion || ""
+      lane: selectedLane || "mid"
     });
-  }, [selectedEnemyChampion, selectedLane, selectedYourChampion, form]);
-  
-  // Fetch enemy champion details when selected
-  useEffect(() => {
-    const enemyChampionId = form.watch("enemyChampion");
-    if (enemyChampionId && champions) {
-      const champion = champions.find(c => c.id === enemyChampionId);
-      setEnemyChampionDetails(champion || null);
-    } else {
-      setEnemyChampionDetails(null);
-    }
-  }, [form.watch("enemyChampion"), champions, form]);
+  }, [selectedEnemyChampion, selectedLane, form]);
   
   // Handle form submission
   const handleSubmit = (values: FormValues) => {
-    console.log("Submitting form with values:", values); // Debug log
     onSubmit(
       values.enemyChampion, 
-      values.lane, 
-      values.yourChampion && values.yourChampion !== "none" ? values.yourChampion : null
+      values.lane
     );
   };
   
@@ -112,9 +83,10 @@ export default function CounterpickForm({
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="bg-lol-blue-dark border border-lol-gold-dark rounded-lg p-6 shadow-lg">
-        <h3 className="font-lol-display text-xl mb-6 text-lol-gold">Select Enemy Champion</h3>
+    <div className="space-y-6 mt-10">
+      <div className="bg-lol-blue-dark border border-lol-gold-dark rounded-lg p-6 shadow-lg outline outline-2 outline-white">
+        {/* Make the main section title bigger */}
+        <h3 className="font-lol-display text-2xl mb-6 text-lol-gold">Select Enemy Champion</h3>
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -124,14 +96,12 @@ export default function CounterpickForm({
               name="enemyChampion"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-medium">Enemy Champion</FormLabel>
+                  {/* Make the 'Enemy Champion' and 'Lane' labels bigger */}
+                  <FormLabel className="font-medium text-lg">Enemy Champion</FormLabel>
                   <FormControl>
                     <SearchableChampionSelect 
                       value={field.value}
-                      onChange={(value) => {
-                        console.log("Selected champion:", value); // Debug log
-                        field.onChange(value);
-                      }}
+                      onChange={field.onChange}
                       placeholder="Search for enemy champion..."
                     />
                   </FormControl>
@@ -146,15 +116,18 @@ export default function CounterpickForm({
               name="lane"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel className="font-medium">Lane</FormLabel>
+                  {/* Make the 'Enemy Champion' and 'Lane' labels bigger */}
+                  <FormLabel className="font-medium text-lg mt-6">Lane</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                       value={field.value}
-                      className="grid grid-cols-5 gap-2"
+                      className="grid grid-cols-5 gap-2 mt-1"
                     >
-                      {lanes.map(lane => (
+                      {lanes.map(lane => {
+                        const isSelected = field.value === lane.id;
+                        return (
                         <div key={lane.id} className="lane-option">
                           <RadioGroupItem 
                             id={lane.id} 
@@ -163,56 +136,37 @@ export default function CounterpickForm({
                           />
                           <label 
                             htmlFor={lane.id}
-                            className="flex flex-col items-center justify-center p-2 cursor-pointer border border-lol-gold-dark rounded bg-lol-blue hover:bg-lol-blue-light peer-checked:bg-gray-700 peer-checked:border-lol-gold"
-                          >
-                            <lane.icon className="mb-1 text-lol-gold h-5 w-5" />
-                            <span className="text-xs">{lane.name}</span>
+                              className={
+                                `group flex flex-col items-center justify-center p-2 cursor-pointer border border-lol-gold-dark rounded transition-colors
+                                ${isSelected ? "bg-white border-lol-gold" : "bg-transparent"}
+                                hover:bg-white hover:border-lol-gold`
+                              }
+                            >
+                              <span className={`mb-1 flex items-center justify-center h-8 w-8 rounded-full border-2 border-white transition-colors ${isSelected ? "text-black" : "text-lol-gold"} group-hover:text-black`}>
+                                <lane.icon className="h-5 w-5 transition-colors" />
+                              </span>
+                              <span className={`text-xs transition-colors ${isSelected ? "text-black" : ""} group-hover:text-black`}>{lane.name}</span>
                           </label>
                         </div>
-                      ))}
+                        );
+                      })}
                     </RadioGroup>
                   </FormControl>
                   <FormMessage />
+                  {/* Add Find Counters button here */}
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-white hover:bg-gray-200 text-black font-bold mt-4 border border-lol-gold-dark shadow"
+                  >
+                    Find Counters
+                  </Button>
                 </FormItem>
               )}
             />
             
-            {/* Your Champion (Optional) Select */}
-            <FormField
-              control={form.control}
-              name="yourChampion"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-medium">Your Champion (Optional)</FormLabel>
-                  <FormControl>
-                    <SearchableChampionSelect 
-                      value={field.value || "none"}
-                      onChange={field.onChange}
-                      placeholder="Search for your champion..."
-                      isOptional={true}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            {/* Submit Button */}
-            <Button 
-              type="submit" 
-              className="w-full bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 transition-colors duration-200"
-            >
-              <Search className="mr-2 h-4 w-4" />
-              Find Counters
-            </Button>
           </form>
         </Form>
       </div>
-      
-      {/* Enemy Champion Preview */}
-      {enemyChampionDetails && (
-        <EnemyChampionPreview champion={enemyChampionDetails} lane={form.watch("lane")} />
-      )}
     </div>
   );
 }

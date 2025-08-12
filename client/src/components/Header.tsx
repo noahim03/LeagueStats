@@ -3,7 +3,7 @@ import { Link } from "wouter";
 export default function Header() {
   return (
     <header className="border-b border-lol-gold-dark">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div className="container mx-auto px-4 py-4 flex justify-center items-center">
         <div className="flex items-center">
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -16,13 +16,6 @@ export default function Header() {
           </svg>
           <h1 className="ml-3 text-xl md:text-2xl font-lol-display font-bold text-lol-gold">LoL Counterpick</h1>
         </div>
-        <nav>
-          <ul className="flex space-x-6">
-            <li><Link href="/" className="text-lol-gray-light hover:text-lol-gold transition-colors">Home</Link></li>
-            <li><a href="#" className="text-lol-gray-light hover:text-lol-gold transition-colors">Champions</a></li>
-            <li><a href="#" className="text-lol-gray-light hover:text-lol-gold transition-colors">About</a></li>
-          </ul>
-        </nav>
       </div>
     </header>
   );
