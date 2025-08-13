@@ -1,10 +1,6 @@
-import axios from 'axios';
+// Use native fetch to avoid extra client dependencies
 
 // Riot API Constants
-const RIOT_API_KEY = import.meta.env.VITE_RIOT_API_KEY;
-if (!RIOT_API_KEY) {
-  console.error("Riot API key not found. Please check your .env file.");
-}
 const REGION = "na1"; // North America region
 const LEAGUE_VERSION = "15.13.1"; // Update this as needed
 
@@ -22,8 +18,10 @@ const CHAMPION_MASTERY_ENDPOINT = `${RIOT_API_BASE_URL}/champion-mastery/v4/cham
  */
 export async function getAllChampions() {
   try {
-    const response = await axios.get(`${DATA_DRAGON_CHAMPION_URL}.json`);
-    return response.data.data;
+    const response = await fetch(`${DATA_DRAGON_CHAMPION_URL}.json`);
+    if (!response.ok) throw new Error(`Failed to fetch champions: ${response.status}`);
+    const data = await response.json();
+    return data.data;
   } catch (error) {
     console.error("Error fetching champions:", error);
     throw error;
@@ -35,8 +33,10 @@ export async function getAllChampions() {
  */
 export async function getChampionDetails(championId: string) {
   try {
-    const response = await axios.get(`${DATA_DRAGON_CHAMPION_URL}/${championId}.json`);
-    return response.data.data[championId];
+    const response = await fetch(`${DATA_DRAGON_CHAMPION_URL}/${championId}.json`);
+    if (!response.ok) throw new Error(`Failed to fetch champion ${championId}: ${response.status}`);
+    const data = await response.json();
+    return data.data[championId];
   } catch (error) {
     console.error(`Error fetching champion ${championId}:`, error);
     throw error;
@@ -48,8 +48,10 @@ export async function getChampionDetails(championId: string) {
  */
 export async function getAllItems() {
   try {
-    const response = await axios.get(DATA_DRAGON_ITEM_URL);
-    return response.data.data;
+    const response = await fetch(DATA_DRAGON_ITEM_URL);
+    if (!response.ok) throw new Error(`Failed to fetch items: ${response.status}`);
+    const data = await response.json();
+    return data.data;
   } catch (error) {
     console.error("Error fetching items:", error);
     throw error;
@@ -61,15 +63,10 @@ export async function getAllItems() {
  */
 export async function getChampionMastery(summonerId: string, championId: string) {
   try {
-    const response = await axios.get(
-      `${CHAMPION_MASTERY_ENDPOINT}/${summonerId}/by-champion/${championId}`,
-      {
-        headers: {
-          "X-Riot-Token": RIOT_API_KEY
-        }
-      }
-    );
-    return response.data;
+    // Route through our server to keep the Riot API key on the server only
+    const response = await fetch(`/api/riot/champion-mastery/${summonerId}/by-champion/${championId}`);
+    if (!response.ok) throw new Error(`Failed to fetch mastery: ${response.status}`);
+    return await response.json();
   } catch (error) {
     console.error(`Error fetching champion mastery for ${championId}:`, error);
     throw error;
@@ -114,8 +111,9 @@ export function getRuneIconUrl(iconRelativePath: string) {
  */
 export async function getAllRunes(patch = LEAGUE_VERSION) {
   try {
-    const response = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US/runesReforged.json`);
-    return response.data;
+    const response = await fetch(`https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US/runesReforged.json`);
+    if (!response.ok) throw new Error(`Failed to fetch runes: ${response.status}`);
+    return await response.json();
   } catch (error) {
     console.error('Error fetching runes:', error);
     throw error;

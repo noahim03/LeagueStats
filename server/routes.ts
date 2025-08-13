@@ -193,6 +193,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   });
+
+  // Riot API proxy endpoint - Champion Mastery by summoner and champion
+  app.get("/api/riot/champion-mastery/:summonerId/by-champion/:championId", checkRiotApiKey, async (req: Request, res: Response) => {
+    try {
+      const { summonerId, championId } = req.params;
+      const url = `https://${RIOT_API_REGION}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/${summonerId}/by-champion/${championId}`;
+      const response = await axios.get(url, {
+        headers: { "X-Riot-Token": RIOT_API_KEY }
+      });
+      res.json(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        res.status(error.response?.status || 500).json({ 
+          message: "Failed to fetch from Riot API", 
+          error: error.response?.data || error.message 
+        });
+      } else {
+        res.status(500).json({ message: "Failed to fetch from Riot API", error: String(error) });
+      }
+    }
+  });
   
   const httpServer = createServer(app);
 
